@@ -11,8 +11,8 @@ const PORT = process.env.PORT;
 app.use(cors());
 app.use(express.json());
 
-const courseRoutes = require('./routes/courseRoutes');
-app.use('/api/courses', courseRoutes);
+const courseRoutes = require("./routes/courseRoutes");
+app.use("/api/courses", courseRoutes);
 
 mongoose
   .connect(process.env.MONGO_URI)
