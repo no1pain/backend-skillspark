@@ -2,6 +2,13 @@ const express = require("express");
 const dotenv = require("dotenv");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const path = require("path");
+const fs = require("fs");
+
+const uploadsDir = path.join(__dirname, "uploads");
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir);
+}
 
 dotenv.config();
 
@@ -11,6 +18,8 @@ const PORT = process.env.PORT;
 app.use(cors());
 app.use(express.json());
 
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
 const courseRoutes = require("./routes/courseRoutes");
 const bookRoutes = require("./routes/bookRoutes");
 
@@ -18,9 +27,11 @@ app.use("/api/courses", courseRoutes);
 app.use("/api/books", bookRoutes);
 
 mongoose
-  .connect(process.env.MONGO_URI)
+  .connect(process.env.MONGO_URI, {
+    dbName: "skillspark",
+  })
   .then(() => {
-    console.log("Connected to MongoDB");
+    console.log("Connected to MongoDB - Database: skillspark");
   })
   .catch((error) => {
     console.error("MongoDB connection error:", error);
