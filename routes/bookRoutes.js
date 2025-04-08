@@ -12,12 +12,10 @@ const {
 const Book = require("../models/Book");
 const { uploadPdf, uploadImage } = require("../config/cloudinary");
 
-router.route("/").get(getAllBooks).post(addBook);
-
+router.route("/").get(getAllBooks);
+router.post("/", uploadPdf, addBook);
 router.route("/:id").get(getBookById).put(updateBook).delete(deleteBook);
-
 router.get("/category/:category", getBooksByCategory);
-
 router.get("/public", getPublicBooks);
 
 router.post("/", uploadPdf, uploadImage, async (req, res) => {
