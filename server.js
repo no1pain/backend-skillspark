@@ -12,7 +12,10 @@ app.use(cors());
 app.use(express.json());
 
 const courseRoutes = require("./routes/courseRoutes");
+const bookRoutes = require("./routes/bookRoutes");
+
 app.use("/api/courses", courseRoutes);
+app.use("/api/books", bookRoutes);
 
 mongoose
   .connect(process.env.MONGO_URI)
