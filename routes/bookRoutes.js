@@ -13,35 +13,54 @@ const Book = require("../models/Book");
 const { uploadPdf, uploadImage } = require("../config/cloudinary");
 
 router.route("/").get(getAllBooks);
-router.post("/", uploadPdf, addBook);
-router.route("/:id").get(getBookById).put(updateBook).delete(deleteBook);
-router.get("/category/:category", getBooksByCategory);
-router.get("/public", getPublicBooks);
 
 router.post("/", uploadPdf, uploadImage, async (req, res) => {
   try {
-    const { title, description } = req.body;
+    const {
+      title,
+      description,
+      category,
+      subcategory,
+      price,
+      pages,
+      author,
+      difficulty,
+      isPublic,
+    } = req.body;
+
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        error: "PDF file is required",
+      });
+    }
 
     const bookData = {
       title,
       description,
-      fileUrl: req.files.pdf.path, // PDF file URL
+      category,
+      subcategory,
+      price,
+      pages,
+      author,
+      difficulty,
+      isPublic,
+      fileUrl: req.file.path,
     };
-
-    // Add image URL if an image was uploaded
-    if (req.files && req.files.image) {
-      bookData.imageUrl = req.files.image.path;
-    }
 
     const book = new Book(bookData);
     await book.save();
 
     res.status(201).json({ success: true, data: book });
   } catch (error) {
-    console.error(error);
+    console.error("Error adding book:", error);
     res.status(500).json({ success: false, error: "Server Error" });
   }
 });
+
+router.route("/:id").get(getBookById).put(updateBook).delete(deleteBook);
+router.route("/category/:category").get(getBooksByCategory);
+router.route("/public").get(getPublicBooks);
 
 // Update book image
 router.patch("/:id/image", uploadImage, async (req, res) => {
