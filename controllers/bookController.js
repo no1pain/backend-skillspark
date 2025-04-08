@@ -1,25 +1,39 @@
 const Book = require("../models/Book");
 const multer = require("multer");
 const path = require("path");
+const fs = require("fs");
 
+// Create uploads directory if it doesn't exist
+const uploadDir = path.join(__dirname, "..", "uploads");
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+// Configure multer storage
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "uploads/");
+    cb(null, uploadDir);
   },
   filename: function (req, file, cb) {
+    // Create unique filename with timestamp and original extension
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
     cb(null, uniqueSuffix + path.extname(file.originalname));
   },
 });
 
+// Configure multer upload
 const upload = multer({
   storage: storage,
   fileFilter: (req, file, cb) => {
+    // Accept only PDF files
     if (file.mimetype === "application/pdf") {
       cb(null, true);
     } else {
       cb(new Error("Only PDF files are allowed"));
     }
+  },
+  limits: {
+    fileSize: 10 * 1024 * 1024, // Limit file size to 10MB
   },
 });
 
@@ -74,7 +88,7 @@ exports.addBook = async (req, res) => {
       console.error("Upload error:", err);
       return res.status(400).json({
         success: false,
-        error: err.message || "Error processing form data",
+        error: err.message || "Error processing file upload",
       });
     }
 
@@ -83,6 +97,14 @@ exports.addBook = async (req, res) => {
       console.log("Body:", req.body);
       console.log("File:", req.file);
 
+      if (!req.file) {
+        return res.status(400).json({
+          success: false,
+          error: "PDF file is required",
+        });
+      }
+
+      // Convert string values to appropriate types
       const bookData = {
         title: req.body.title,
         description: req.body.description,
@@ -94,8 +116,8 @@ exports.addBook = async (req, res) => {
         author: req.body.author,
         difficulty: req.body.difficulty,
         isPublic: req.body.isPublic === "true",
-        fileUrl: req.file ? `/uploads/${req.file.filename}` : undefined,
-        fileFormat: req.body.fileFormat,
+        fileUrl: `/uploads/${req.file.filename}`,
+        fileFormat: "PDF",
       };
 
       console.log("=== Processed Data ===");

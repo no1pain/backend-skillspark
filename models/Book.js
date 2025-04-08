@@ -41,9 +41,21 @@ const bookSchema = new mongoose.Schema(
       enum: ["Beginner", "Intermediate", "Advanced"],
       default: "Beginner",
     },
+    fileUrl: {
+      type: String,
+    },
+    fileFormat: {
+      type: String,
+      enum: ["PDF"],
+      default: "PDF",
+    },
     createdAt: {
       type: Date,
       default: Date.now,
+    },
+    imageUrl: {
+      type: String,
+      default: null,
     },
   },
   {
