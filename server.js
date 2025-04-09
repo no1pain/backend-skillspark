@@ -22,6 +22,7 @@ app.use(
       "Origin",
       "Accept",
       "X-Requested-With",
+      "Access-Control-Allow-Origin",
     ],
     credentials: true,
     preflightContinue: false,
