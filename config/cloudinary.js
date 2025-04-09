@@ -52,4 +52,5 @@ const uploadImage = multer({
 module.exports = {
   uploadPdf: uploadPdf.single("pdf"),
   uploadImage: uploadImage.single("image"),
+  cloudinary,
 };
